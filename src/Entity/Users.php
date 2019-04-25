@@ -9,12 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Users
 {
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Problematique", cascade={"persist"})
-     */
-    private $problematique;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -41,62 +35,54 @@ class Users
      * @ORM\Column(type="string", length=1)
      */
     private $sexe;
-
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $email;
-
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $motdepasse;
-
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $photo;
-
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $langue;
-
     /**
-     * @ORM\Column(type="string", length=1)
+     * @ORM\Column(type="string", length=255)
      */
     private $etat;
-
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $Pays;
-
+    private $pays;
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $Ville;
-
+    private $ville;
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=255)
      */
-    private $Online;
-
+    private $online;
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=255)
      */
     private $active;
-
     /**
-     * @ORM\Column(type="string", length=6)
+     * @ORM\Column(type="string", length=255)
      */
     private $code_activation;
-
-
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $keypush;
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $telephone;
 
     public function getId(): ?int
     {
@@ -202,46 +188,46 @@ class Users
 
     public function getPays(): ?string
     {
-        return $this->Pays;
+        return $this->pays;
     }
 
-    public function setPays(string $Pays): self
+    public function setPays(string $pays): self
     {
-        $this->Pays = $Pays;
+        $this->pays = $pays;
 
         return $this;
     }
 
     public function getVille(): ?string
     {
-        return $this->Ville;
+        return $this->ville;
     }
 
-    public function setVille(string $Ville): self
+    public function setVille(string $ville): self
     {
-        $this->Ville = $Ville;
+        $this->ville = $ville;
 
         return $this;
     }
 
-    public function getOnline(): ?int
+    public function getOnline(): ?string
     {
-        return $this->Online;
+        return $this->online;
     }
 
-    public function setOnline(int $Online): self
+    public function setOnline(string $online): self
     {
-        $this->Online = $Online;
+        $this->online = $online;
 
         return $this;
     }
 
-    public function getActive(): ?int
+    public function getActive(): ?string
     {
         return $this->active;
     }
 
-    public function setActive(int $active): self
+    public function setActive(string $active): self
     {
         $this->active = $active;
 
@@ -260,7 +246,29 @@ class Users
         return $this;
     }
 
+    public function getKeypush(): ?string
+    {
+        return $this->keypush;
+    }
 
+    public function setKeypush(string $keypush): self
+    {
+        $this->keypush = $keypush;
+
+        return $this;
+    }
+
+    public function getTelephone(): ?string
+    {
+        return $this->telephone;
+    }
+
+    public function setTelephone(string $telephone): self
+    {
+        $this->telephone = $telephone;
+
+        return $this;
+    }
 
     public function getDatenaissance(): ?\DateTimeInterface
     {
@@ -270,30 +278,6 @@ class Users
     public function setDatenaissance(\DateTimeInterface $datenaissance): self
     {
         $this->datenaissance = $datenaissance;
-
-        return $this;
-    }
-
-    public function getProblematique(): ?Problematique
-    {
-        return $this->problematique;
-    }
-
-    public function setProblematique(?Problematique $problematique): self
-    {
-        $this->problematique = $problematique;
-
-        return $this;
-    }
-
-    public function getKeypush(): ?string
-    {
-        return $this->keypush;
-    }
-
-    public function setKeypush(string $keypush): self
-    {
-        $this->keypush = $keypush;
 
         return $this;
     }

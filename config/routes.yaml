@@ -5,54 +5,6 @@ app_api_connexion:
   path: /api/connexion
   controller: App\Controller\ConnexionController::connexion
 
-app_api_SaveMessagePublic:
-  path: /api/SaveMessagePublic
-  controller: App\Controller\HomeController::SaveMessagePublic
-
-app_api_photomessagepublic:
-  path: /api/photomessagepublic
-  controller: App\Controller\HomeController::photomessagepublic
-
-app_api_deletephotomessagepublic:
-  path: /api/deletephotomessagepublic
-  controller: App\Controller\HomeController::deletephotomessagepublic
-
-app_api_displayPublicMessage:
-  path: /api/displayPublicMessage
-  controller: App\Controller\HomeController::displayPublicMessage
-
-app_api_insertUsers:
-  path: /api/insertUsers
-  controller: App\Controller\HomeController::insertUsers
-
-app_api_updatelibelleuserphoto:
-  path: /api/updatelibelleuserphoto
-  controller: App\Controller\HomeController::updatelibelleuserphoto
-
-app_api_ProbElasticSearchService:
-  path: /api/ProbElasticSearchService
-  controller: App\Controller\HomeController::ProbElasticSearchService
-
-app_api_displayAllcatprob:
-  path: /api/displayAllcatprob
-  controller: App\Controller\HomeController::displayAllcatprob
-
-app_api_displayproblematique:
-  path: /api/displayproblematique
-  controller: App\Controller\HomeController::displayproblematique
-
-app_api_searchproblematique:
-  path: /api/searchproblematique
-  controller: App\Controller\HomeController::searchproblematique
-
-app_api_changeproblematique:
-  path: /api/changeproblematique
-  controller: App\Controller\HomeController::changeproblematique
-
-app_api_addComment:
-  path: /api/addComment
-  controller: App\Controller\HomeController::addComment
-
-app_api_displayComment:
-  path: /api/displayComment
-  controller: App\Controller\HomeController::displayComment
+app_api_createuser:
+  path: /api/CreateUser
+  controller: App\Controller\ConnexionController::CreateUser

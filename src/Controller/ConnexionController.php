@@ -20,8 +20,6 @@ class ConnexionController extends AbstractController
     {
         $email = $request->query->get('email');
         $password = $request->query->get('password');
-        /*$email="bossprogrammaleo@gmail.com";
-        $password = "maleo9393";*/
         $password_sha1 = sha1($password);
 
 
@@ -34,6 +32,8 @@ class ConnexionController extends AbstractController
         );
 
 
+
+
         if($userslist)
         {
             foreach($userslist as $user_item)
@@ -41,12 +41,8 @@ class ConnexionController extends AbstractController
                 $user = $user_item;
             }
 
-            if($user->getProblematique())
-            {
                 $response = new Response(json_encode(array('succes' => 1
                 ,'id' => $user->getId()
-                ,'id_prob' => $user->getProblematique()->getID()
-                ,'libelle_prob' => $user->getProblematique()->getLibelle()
                 ,'nom' => $user->getNom()
                 ,'prenom' => $user->getPrenom()
                 ,'datenaissance' => $user->getDatenaissance()
@@ -59,36 +55,74 @@ class ConnexionController extends AbstractController
                 ,'ville' => $user->getVille()
                 ,'keypush' => $user->getKeypush()
                 ,'online' => $user->getOnline()
-                ,'active' => $user->getActive())));
-            } else {
-                $response = new Response(json_encode(array('succes' => 1
-                ,'id' => $user->getId()
-                ,'id_prob' => 0
-                ,'libelle_prob' => ''
-                ,'nom' => $user->getNom()
-                ,'prenom' => $user->getPrenom()
-                ,'datenaissance' => $user->getDatenaissance()
-                ,'sexe' => $user->getSexe()
-                ,'photo' => $user->getPhoto()
-                ,'email' => $user->getEmail()
-                ,'langue' => $user->getLangue()
-                ,'etat' => $user->getEtat()
-                ,'pays' => $user->getPays()
-                ,'ville' => $user->getVille()
-                ,'keypush' => $user->getKeypush()
-                ,'online' => $user->getOnline()
-                ,'active' => $user->getActive())));
-            }
-
-
+                ,'active' => $user->getActive()
+                ,'telephone' => $user->getTelephone())));
+            //$response = new Response(json_encode(array('succes' => 1)));
         }else
         {
             $response = new Response(json_encode(array('succes' => 0)));
         }
 
+
+        /*$response = new Response(json_encode($response));*/
+        /*$response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');*/
+
+
+        //$response = new Response(json_encode(array("succes"=>142)));
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
 
+
+    public function CreateUser(Request $request){
+
+        $em = $this->getDoctrine()->getManager();
+
+        $nom = $request->query->get('nom');
+        $prenom = $request->query->get('prenom');
+        $email= $request->query->get('email');
+        $date_naissance = $request->query->get('date');
+        $sexe = $request->query->get('sexe');
+        $password = $request->query->get('password');
+        $code = $request->query->get('codedevalidation');
+        $user = new Users();
+        $user->setActive(1);
+        $user->setDatenaissance(new \DateTime($date_naissance));
+        $user->setEmail($email);
+        $user->setNom($nom);
+        $user->setPrenom($prenom);
+        $user->setMotdepasse(sha1($password));
+        $user->setSexe($sexe);
+        $user->setPhoto('');
+        $user->setLangue('');
+        $user->setKeypush('');
+        $user->setEtat('');
+        $user->setPays('');
+        $user->setVille('');
+        $user->setOnline(1);
+        $user->setCodeActivation($code);
+        $user->setTelephone('');
+
+        $em->persist($user);
+        $em->flush();
+        $response = new Response(json_encode(array('succes' => 1
+        ,'id' => $user->getId()
+        ,'nom' => $user->getNom()
+        ,'prenom' => $user->getPrenom()
+        ,'datenaissance' => $user->getDatenaissance()
+        ,'sexe' => $user->getSexe()
+        ,'photo' => $user->getPhoto()
+        ,'email' => $user->getEmail()
+        ,'langue' => $user->getLangue()
+        ,'etat' => $user->getEtat()
+        ,'pays' => $user->getPays()
+        ,'ville' => $user->getVille()
+        ,'online' => $user->getOnline()
+        ,'active' => $user->getActive())));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
         return $response;
     }
 
