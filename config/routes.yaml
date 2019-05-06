@@ -8,3 +8,19 @@ app_api_connexion:
 app_api_createuser:
   path: /api/CreateUser
   controller: App\Controller\ConnexionController::CreateUser
+
+app_api_updatelibelleuserphoto:
+  path: /api/updatelibelleuserphoto
+  controller: App\Controller\ConnexionController::updatelibelleuserphoto
+
+app_api_UpdateKeyPush:
+  path: /api/UpdateKeyPush
+  controller: App\Controller\ConnexionController::UpdateKeyPush
+
+app_api_searchtown:
+  path: /api/SearchTown
+  controller: App\Controller\HomeController::SearchTown
+
+app_api_insertannonce:
+  path: /api/InsertAnnonce
+  controller: App\Controller\HomeController::InsertAnnonce

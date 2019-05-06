@@ -126,4 +126,35 @@ class ConnexionController extends AbstractController
         return $response;
     }
 
+    public function updatelibelleuserphoto(Request $request) {
+
+        $em = $this->getDoctrine()->getManager();
+        $id_user = $request->query->get('id_user');
+        $libelle_photo = $request->query->get('libelle_photo');
+        $user = $em->getRepository('App\Entity\Users')->find($id_user);
+        $user->setPhoto($libelle_photo);
+        $em->persist($user);
+        $em->flush();
+
+        $response = new Response(json_encode(array('succes' => 1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+    public function UpdateKeyPush(Request $request){
+        $id_user = $request->query->get('ID');
+        $keypush = $request->query->get('PUSHKEY');
+
+        $em = $this->getDoctrine()->getManager();
+        $User = $em->getRepository('App\Entity\Users')->find($id_user);
+        $User->setKeypush($keypush);
+        $em->persist($User);
+        $em->flush();
+        $response = new Response(json_encode(array('succes' => 1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
 }
