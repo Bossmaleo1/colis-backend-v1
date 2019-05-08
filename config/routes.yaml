@@ -17,6 +17,10 @@ app_api_UpdateKeyPush:
   path: /api/UpdateKeyPush
   controller: App\Controller\ConnexionController::UpdateKeyPush
 
+app_api_updatePhonenumber:
+  path: /api/updatePhonenumber
+  controller: App\Controller\ConnexionController::updatePhonenumber
+
 app_api_searchtown:
   path: /api/SearchTown
   controller: App\Controller\HomeController::SearchTown
@@ -24,3 +28,11 @@ app_api_searchtown:
 app_api_insertannonce:
   path: /api/InsertAnnonce
   controller: App\Controller\HomeController::InsertAnnonce
+
+app_api_insertavis:
+  path: /api/InsertAvis
+  controller: App\Controller\HomeController::InsertAvis
+
+app_api_Rechercher:
+  path: /api/Rechercher
+  controller: App\Controller\HomeController::Rechercher

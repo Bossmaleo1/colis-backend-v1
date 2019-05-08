@@ -33,9 +33,14 @@ class Annonce
     private $heure_arrivee;
 
     /**
+ * @ORM\Column(type="float")
+ */
+    private $nombre_kilo;
+
+    /**
      * @ORM\Column(type="float")
      */
-    private $nombre_kilo;
+    private $prix;
 
 
     /**
@@ -57,6 +62,18 @@ class Annonce
      * @ORM\Column(type="datetime")
      */
     private $dateannonce;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $id_aeroport_depart;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $id_aeroport_arrivee;
+
+
 
     public function getId(): ?int
     {
@@ -155,6 +172,42 @@ class Annonce
     public function setDateannonce(\DateTimeInterface $dateannonce): self
     {
         $this->dateannonce = $dateannonce;
+
+        return $this;
+    }
+
+    public function getPrix(): ?float
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(float $prix): self
+    {
+        $this->prix = $prix;
+
+        return $this;
+    }
+
+    public function getIdAeroportDepart(): ?int
+    {
+        return $this->id_aeroport_depart;
+    }
+
+    public function setIdAeroportDepart(int $id_aeroport_depart): self
+    {
+        $this->id_aeroport_depart = $id_aeroport_depart;
+
+        return $this;
+    }
+
+    public function getIdAeroportArrivee(): ?int
+    {
+        return $this->id_aeroport_arrivee;
+    }
+
+    public function setIdAeroportArrivee(int $id_aeroport_arrivee): self
+    {
+        $this->id_aeroport_arrivee = $id_aeroport_arrivee;
 
         return $this;
     }

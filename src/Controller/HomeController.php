@@ -7,6 +7,7 @@ use App\Entity\Users;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Carbon\Carbon;
 
 class HomeController extends AbstractController
 {
@@ -36,7 +37,6 @@ class HomeController extends AbstractController
     public  function InsertAnnonce(Request $request){
 
         $em = $this->getDoctrine()->getManager();
-        //$result = array();
         $heure_depart = $request->query->get('heure_depart');
         $heure_arrivee = $request->query->get('heure_arrivee');
         $nom_kilo_max = $request->query->get('max_kilo');
@@ -46,6 +46,7 @@ class HomeController extends AbstractController
         $id_users = $request->query->get('id_user');
         $aeroportiddepart = $request->query->get('id_aeroport1');
         $aeroportidarrivee = $request->query->get('id_aeroport2');
+        $prix = $request->query->get('prix');
 
         $user = $em->getRepository('App\Entity\Users')->find($id_users);
         //on cree l'annonce
@@ -58,26 +59,98 @@ class HomeController extends AbstractController
         $annonce->setHeureDepart(new \DateTime($heure_depart)) ;
         $annonce->setHeureArrivee(new \DateTime($heure_arrivee));
         $annonce->setDateannonce(new \DateTime($dateannonce));
+        $annonce->setIdAeroportDepart($aeroportiddepart);
+        $annonce->setIdAeroportArrivee($aeroportidarrivee);
+        $annonce->setPrix($prix);
         $annonce->setDate(new \DateTime());
         $annonce->setUsers($user);
         $em->persist($annonce);
         $em->flush();
-        //on cree les villes de depart et d'arrivee
-        $aeroportdepart = $em->getRepository('App\Entity\Aeroportinternationnal')->find($aeroportiddepart);
-        $aeroportarrivee = $em->getRepository('App\Entity\Aeroportinternationnal')->find($aeroportidarrivee);
-        $villeannoncedepart = new VilleAnnonce();
-        $villeannoncearrivee = new VilleAnnonce();
-        $villeannoncedepart->setAeroportinternational($aeroportdepart);
-        $villeannoncedepart->setAnnonce($annonce);
-        $villeannoncearrivee->setAeroportinternational($aeroportarrivee);
-        $villeannoncearrivee->setAnnonce($annonce);
-        $em->persist($villeannoncedepart);
-        $em->flush();
-        $em->persist($villeannoncearrivee);
+
+
+        $response = new Response(json_encode(array("succes"=>1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+
+    public function InsertAvis(Request $request) {
+
+        $em = $this->getDoctrine()->getManager();
+        $note = $request->query->get('note');
+        $commentaire = $request->query('commentaire');
+        $id_annonce = $request->query('id_annonce');
+        $id_emmeteur = $request->query('id_emmeteur');
+        $id_recepteur = $request->query('id_recepteur');
+
+
+        $annonce = $em->getRepository('App\Entity\Annonce')->find($id_annonce);
+        //on ajoute un avis
+        $avis = new Avis();
+        $avis->setNote($note);
+        $avis->setCommentaire($commentaire);
+        $avis->setIdEmmetteur($id_emmeteur);
+        $avis->setIdRecepteur($id_recepteur);
+        $avis->setAnnonce($annonce);
+        $avis->setDate(new \DateTime());
+        $em->persist($avis);
         $em->flush();
 
 
         $response = new Response(json_encode(array("succes"=>1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+
+    public function Rechercher(Request $request) {
+        $result = array();
+        $em = $this->getDoctrine()->getManager();
+        $id_ville_depart = $request->query->get('lieux_depart');
+        $id_ville_arrivee = $request->query->get('lieux_arrivee');
+        $datevoyage = $request->query->get('date_voyage');
+
+        $AnnonceRepository = $this->get('doctrine')->getRepository(Annonce::class);
+        $annoncelist = $AnnonceRepository->findBy(
+            array('lieux_rdv1' => $id_ville_depart,'lieux_rdv2' => $id_ville_arrivee,'date' => $datevoyage),
+            array(),
+            100,
+            0
+        );
+
+        if($annoncelist){
+
+            $result['succes'] = 1;
+
+            foreach($annoncelist as $annonce_item)
+            {
+                $array_temp = array();
+                $aeroportdepart = $em->getRepository('App\Entity\Users')->find($annonce_item->getIdAeroportDepart());
+                $aeroportarrivee = $em->getRepository('App\Entity\Users')->find($annonce_item->getIdAeroportArrivee());
+                $array_temp['ID'] = $annonce_item->getId();
+                $array_temp['ID_USER'] = $annonce_item->getUsers()->getId();
+                $array_temp['PHOTO_USER'] = $annonce_item->getUsers()->getPhoto();
+                $array_temp['NOM_USER'] = $annonce_item->getUsers()->getPrenom()." ".$annonce_item->getUsers()->getNom();
+                $array_temp['DATE_ANNONCE'] = Carbon::parse($annonce_item->getDate())->locale('fr_FR')->diffForHumans();
+                $array_temp['DATE_ANNONCE_VOYAGE'] = $annonce_item->getDateannonce();
+                $array_temp['Prix'] = $annonce_item->getPrix();
+                $array_temp['lieux_depart'] = $aeroportdepart->getVille()->getLibelle()." (".$aeroportdepart->getVille()->getPays()->getLibelle()."(".$aeroportdepart->getLibelle().",".$aeroportdepart->getCode()."))";
+                $array_temp['lieux_arrivee'] = $aeroportarrivee->getVille()->getLibelle()." (".$aeroportarrivee->getVille()->getPays()->getLibelle()."(".$aeroportarrivee->getLibelle().",".$aeroportarrivee->getCode()."))";
+                $array_temp['heure_depart'] = $annonce_item->getHeureDepart();
+                $array_temp['heure_darrivee'] = $annonce_item->getHeureArrivee();
+                $array_temp['nombre_kilo'] = $annonce_item->getNombreKilo();
+                array_push($result,$array_temp);
+            }
+
+        }else {
+            $result['succes'] = 0;
+            //$response = new Response(json_encode(array('succes' => 0)));
+        }
+
+
+        $response = new Response(json_encode($result));
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
         return $response;

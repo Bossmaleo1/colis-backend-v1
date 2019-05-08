@@ -37,6 +37,16 @@ class Avis
      */
     private $date;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $id_emmetteur;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $id_recepteur;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,6 +96,30 @@ class Avis
     public function setAnnonce(?Annonce $annonce): self
     {
         $this->annonce = $annonce;
+
+        return $this;
+    }
+
+    public function getIdEmmetteur(): ?int
+    {
+        return $this->id_emmetteur;
+    }
+
+    public function setIdEmmetteur(int $id_emmetteur): self
+    {
+        $this->id_emmetteur = $id_emmetteur;
+
+        return $this;
+    }
+
+    public function getIdRecepteur(): ?int
+    {
+        return $this->id_recepteur;
+    }
+
+    public function setIdRecepteur(int $id_recepteur): self
+    {
+        $this->id_recepteur = $id_recepteur;
 
         return $this;
     }

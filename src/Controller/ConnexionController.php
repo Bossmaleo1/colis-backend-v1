@@ -157,4 +157,20 @@ class ConnexionController extends AbstractController
         return $response;
     }
 
+    public function updatePhonenumber(Request $request) {
+
+        $em = $this->getDoctrine()->getManager();
+        $id_user = $request->query->get('id_user');
+        $phonenumber = $request->query->get('phonenumber');
+        $user = $em->getRepository('App\Entity\Users')->find($id_user);
+        $user->setTelephone($phonenumber);
+        $em->persist($user);
+        $em->flush();
+
+        $response = new Response(json_encode(array('succes' => 1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
 }
