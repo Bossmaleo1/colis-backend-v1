@@ -114,7 +114,7 @@ class HomeController extends AbstractController
 
         $AnnonceRepository = $this->get('doctrine')->getRepository(Annonce::class);
         $annoncelist = $AnnonceRepository->findBy(
-            array('id_aeroport_depart' => $id_ville_depart,'id_aeroport_depart' => $id_ville_arrivee,'dateannonce' => new \DateTime($datevoyage)),
+            array('id_aeroport_depart' => $id_ville_depart,'id_aeroport_arrivee' => $id_ville_arrivee,'dateannonce' => new \DateTime($datevoyage)),
             array(),
             100,
             0
@@ -133,12 +133,15 @@ class HomeController extends AbstractController
                 $array_temp['NOM_USER'] = $annonce_item->getUsers()->getPrenom()." ".$annonce_item->getUsers()->getNom();
                 $array_temp['PHONE_USER'] = $annonce_item->getUsers()->getTelephone();
                 $array_temp['DATE_ANNONCE'] = Carbon::parse($annonce_item->getDate())->locale('fr_FR')->diffForHumans();
-                $array_temp['DATE_ANNONCE_VOYAGE'] = $annonce_item->getDateannonce();
+                $temp_date = explode(" ", $annonce_item->getDateannonce()->format('Y-m-d H:i:s'))[0];
+                $array_temp['DATE_ANNONCE_VOYAGE'] = explode("-",$temp_date)[2]."-".explode("-",$temp_date)[1]."-".explode("-",$temp_date)[0];
                 $array_temp['Prix'] = $annonce_item->getPrix();
-                $array_temp['lieux_depart'] = $annonce_item->getLieuxRdv1();
-                $array_temp['lieux_arrivee'] = $annonce_item->getLieuxRdv2();
-                $array_temp['heure_depart'] = $annonce_item->getHeureDepart();
-                $array_temp['heure_darrivee'] = $annonce_item->getHeureArrivee();
+                $array_temp['lieux_rdv1'] = $annonce_item->getLieuxRdv1();
+                $array_temp['lieux_rdv2'] = $annonce_item->getLieuxRdv2();
+                $array_temp['ville_depart'] = $aeroportdepart->getVille()->getLibelle()." (".$aeroportdepart->getVille()->getPays()->getLibelle()."(".$aeroportdepart->getLibelle().",".$aeroportdepart->getCode()."))";
+                $array_temp['ville_arrivee'] = $aeroportarrivee->getVille()->getLibelle()." (".$aeroportarrivee->getVille()->getPays()->getLibelle()."(".$aeroportarrivee->getLibelle().",".$aeroportarrivee->getCode()."))";
+                $array_temp['heure_depart'] = explode(" ", $annonce_item->getHeureDepart()->format('Y-m-d H:i:s'))[1];
+                $array_temp['heure_darrivee'] = explode(" ", $annonce_item->getHeureArrivee()->format('Y-m-d H:i:s'))[1];
                 $array_temp['nombre_kilo'] = $annonce_item->getNombreKilo();
                 array_push($result,$array_temp);
             }
