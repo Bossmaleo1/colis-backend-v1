@@ -87,6 +87,7 @@ class ConnexionController extends AbstractController
         $sexe = $request->query->get('sexe');
         $password = $request->query->get('password');
         $code = $request->query->get('codedevalidation');
+        $telephone = $request->query->get('telephone');
         $user = new Users();
         $user->setActive(1);
         $user->setDatenaissance(new \DateTime($date_naissance));
@@ -103,7 +104,7 @@ class ConnexionController extends AbstractController
         $user->setVille('');
         $user->setOnline(1);
         $user->setCodeActivation($code);
-        $user->setTelephone('');
+        $user->setTelephone($telephone);
 
         $em->persist($user);
         $em->flush();

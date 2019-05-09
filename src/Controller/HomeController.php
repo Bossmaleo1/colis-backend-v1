@@ -114,7 +114,7 @@ class HomeController extends AbstractController
 
         $AnnonceRepository = $this->get('doctrine')->getRepository(Annonce::class);
         $annoncelist = $AnnonceRepository->findBy(
-            array('lieux_rdv1' => $id_ville_depart,'lieux_rdv2' => $id_ville_arrivee,'date' => $datevoyage),
+            array('id_aeroport_depart' => $id_ville_depart,'id_aeroport_depart' => $id_ville_arrivee,'dateannonce' => new \DateTime($datevoyage)),
             array(),
             100,
             0
@@ -122,31 +122,27 @@ class HomeController extends AbstractController
 
         if($annoncelist){
 
-            $result['succes'] = 1;
-
             foreach($annoncelist as $annonce_item)
             {
                 $array_temp = array();
-                $aeroportdepart = $em->getRepository('App\Entity\Users')->find($annonce_item->getIdAeroportDepart());
-                $aeroportarrivee = $em->getRepository('App\Entity\Users')->find($annonce_item->getIdAeroportArrivee());
+                $aeroportdepart = $em->getRepository('App\Entity\Aeroportinternationnal')->find($id_ville_depart);
+                $aeroportarrivee = $em->getRepository('App\Entity\Aeroportinternationnal')->find($id_ville_arrivee);
                 $array_temp['ID'] = $annonce_item->getId();
                 $array_temp['ID_USER'] = $annonce_item->getUsers()->getId();
                 $array_temp['PHOTO_USER'] = $annonce_item->getUsers()->getPhoto();
                 $array_temp['NOM_USER'] = $annonce_item->getUsers()->getPrenom()." ".$annonce_item->getUsers()->getNom();
+                $array_temp['PHONE_USER'] = $annonce_item->getUsers()->getTelephone();
                 $array_temp['DATE_ANNONCE'] = Carbon::parse($annonce_item->getDate())->locale('fr_FR')->diffForHumans();
                 $array_temp['DATE_ANNONCE_VOYAGE'] = $annonce_item->getDateannonce();
                 $array_temp['Prix'] = $annonce_item->getPrix();
-                $array_temp['lieux_depart'] = $aeroportdepart->getVille()->getLibelle()." (".$aeroportdepart->getVille()->getPays()->getLibelle()."(".$aeroportdepart->getLibelle().",".$aeroportdepart->getCode()."))";
-                $array_temp['lieux_arrivee'] = $aeroportarrivee->getVille()->getLibelle()." (".$aeroportarrivee->getVille()->getPays()->getLibelle()."(".$aeroportarrivee->getLibelle().",".$aeroportarrivee->getCode()."))";
+                $array_temp['lieux_depart'] = $annonce_item->getLieuxRdv1();
+                $array_temp['lieux_arrivee'] = $annonce_item->getLieuxRdv2();
                 $array_temp['heure_depart'] = $annonce_item->getHeureDepart();
                 $array_temp['heure_darrivee'] = $annonce_item->getHeureArrivee();
                 $array_temp['nombre_kilo'] = $annonce_item->getNombreKilo();
                 array_push($result,$array_temp);
             }
 
-        }else {
-            $result['succes'] = 0;
-            //$response = new Response(json_encode(array('succes' => 0)));
         }
 
 
