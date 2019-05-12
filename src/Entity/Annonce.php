@@ -64,6 +64,11 @@ class Annonce
     private $dateannonce;
 
     /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateannonce2;
+
+    /**
      * @ORM\Column(type="integer")
      */
     private $id_aeroport_depart;
@@ -208,6 +213,18 @@ class Annonce
     public function setIdAeroportArrivee(int $id_aeroport_arrivee): self
     {
         $this->id_aeroport_arrivee = $id_aeroport_arrivee;
+
+        return $this;
+    }
+
+    public function getDateannonce2(): ?\DateTimeInterface
+    {
+        return $this->dateannonce2;
+    }
+
+    public function setDateannonce2(\DateTimeInterface $dateannonce2): self
+    {
+        $this->dateannonce2 = $dateannonce2;
 
         return $this;
     }

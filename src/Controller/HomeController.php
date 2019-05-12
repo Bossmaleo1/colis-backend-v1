@@ -43,6 +43,7 @@ class HomeController extends AbstractController
         $lieux_rdv1 = $request->query->get('lieux_rdv1');
         $lieux_rdv2 = $request->query->get('lieux_rdv2');
         $dateannonce = $request->query->get('dateannonce');
+        $dateannonce2 = $request->query->get('dateannonce2');
         $id_users = $request->query->get('id_user');
         $aeroportiddepart = $request->query->get('id_aeroport1');
         $aeroportidarrivee = $request->query->get('id_aeroport2');
@@ -59,6 +60,7 @@ class HomeController extends AbstractController
         $annonce->setHeureDepart(new \DateTime($heure_depart)) ;
         $annonce->setHeureArrivee(new \DateTime($heure_arrivee));
         $annonce->setDateannonce(new \DateTime($dateannonce));
+        $annonce->setDateannonce2(new \DateTime($dateannonce2));
         $annonce->setIdAeroportDepart($aeroportiddepart);
         $annonce->setIdAeroportArrivee($aeroportidarrivee);
         $annonce->setPrix($prix);
@@ -134,7 +136,9 @@ class HomeController extends AbstractController
                 $array_temp['PHONE_USER'] = $annonce_item->getUsers()->getTelephone();
                 $array_temp['DATE_ANNONCE'] = Carbon::parse($annonce_item->getDate())->locale('fr_FR')->diffForHumans();
                 $temp_date = explode(" ", $annonce_item->getDateannonce()->format('Y-m-d H:i:s'))[0];
+                $temp_date2 = explode(" ", $annonce_item->getDateannonce2()->format('Y-m-d H:i:s'))[0];
                 $array_temp['DATE_ANNONCE_VOYAGE'] = explode("-",$temp_date)[2]."-".explode("-",$temp_date)[1]."-".explode("-",$temp_date)[0];
+                $array_temp['DATE_ANNONCE_VOYAGE2'] = explode("-",$temp_date2)[2]."-".explode("-",$temp_date2)[1]."-".explode("-",$temp_date2)[0];
                 $array_temp['Prix'] = $annonce_item->getPrix();
                 $array_temp['lieux_rdv1'] = $annonce_item->getLieuxRdv1();
                 $array_temp['lieux_rdv2'] = $annonce_item->getLieuxRdv2();
