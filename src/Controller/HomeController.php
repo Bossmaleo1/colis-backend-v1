@@ -4,6 +4,8 @@ namespace App\Controller;
 use App\Entity\Annonce;
 use App\Entity\VilleAnnonce;
 use App\Entity\Users;
+use App\Entity\ValidationAnnonce;
+use App\Entity\Notification;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -134,6 +136,7 @@ class HomeController extends AbstractController
                 $array_temp['PHOTO_USER'] = $annonce_item->getUsers()->getPhoto();
                 $array_temp['NOM_USER'] = $annonce_item->getUsers()->getPrenom()." ".$annonce_item->getUsers()->getNom();
                 $array_temp['PHONE_USER'] = $annonce_item->getUsers()->getTelephone();
+				$array_temp['KEYPUSH'] = $annonce_item->getUsers()->getKeypush();
                 $array_temp['DATE_ANNONCE'] = Carbon::parse($annonce_item->getDate())->locale('fr_FR')->diffForHumans();
                 $temp_date = explode(" ", $annonce_item->getDateannonce()->format('Y-m-d H:i:s'))[0];
                 $temp_date2 = explode(" ", $annonce_item->getDateannonce2()->format('Y-m-d H:i:s'))[0];
@@ -158,5 +161,68 @@ class HomeController extends AbstractController
         $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
         return $response;
     }
+
+    public function ValidationAnnonce(Request $request) {
+
+
+
+        $response = new Response(json_encode(array('succes'=>1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+    public function InsertValidation(Request $request) {
+
+        $em = $this->getDoctrine()->getManager();
+
+        $nombre_de_kilo_max = $request->get('nombrekilo');
+        $description_colis = $request->get('description');
+        $id_annonce = $request->get('id_annonce');
+        $id_emmetteur = $request->get('id_emmetteur');
+        $Libelle = $request->get('libelle');
+
+
+        $annonce = $em->getRepository('App\Entity\Annonce')->find($id_annonce);
+
+
+        //insertion de la validation
+        $validation = new  ValidationAnnonce();
+        $validation->setDateValidation(new \DateTime());
+        $validation->setNombreDeKiloMax($nombre_de_kilo_max);
+        $validation->setStatutValidation(0);
+        $validation->setAnnonce($annonce);
+        $validation->setDescriptionColis($description_colis);
+        $validation->setIdEmmeteur($id_emmetteur);
+
+        //insertion de la notification
+        $notification = new Notification();
+        $notification->setIDLibelle($id_annonce);
+        $notification->setIDType(0);
+        $notification->setLibelle($Libelle);
+        $notification->setEtat(0);
+        $notification->setIDUser($annonce->getUsers()->getId());
+        $notification->setDate(new \DateTime());
+        $em->persist($validation);
+        $em->flush();
+        $em->persist($notification);
+        $em->flush();
+        $response = new Response(json_encode(array('succes'=>1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+    public function AfficherValidation(Request $request) {
+
+
+
+        $response = new Response(json_encode(array('succes'=>1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+
 
 }

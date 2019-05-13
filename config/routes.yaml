@@ -36,3 +36,15 @@ app_api_insertavis:
 app_api_Rechercher:
   path: /api/Rechercher
   controller: App\Controller\HomeController::Rechercher
+
+app_api_ValidationAnnonce:
+  path: /api/ValidationAnnonce
+  controller: App\Controller\HomeController::ValidationAnnonce
+
+app_api_InsertValidation:
+  path: /api/InsertValidation
+  controller: App\Controller\HomeController::InsertValidation
+
+app_api_AfficherValidation:
+  path: /api/AfficherValidation
+  controller: App\Controller\HomeController::AfficherValidation

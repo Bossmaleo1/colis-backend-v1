@@ -32,6 +32,16 @@ class ValidationAnnonce
     private $statut_validation;
 
     /**
+     * @ORM\Column(type="string")
+     */
+    private $id_emmeteur;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $description_colis;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Annonce")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -86,6 +96,30 @@ class ValidationAnnonce
     public function setAnnonce(?Annonce $annonce): self
     {
         $this->annonce = $annonce;
+
+        return $this;
+    }
+
+    public function getDescriptionColis(): ?string
+    {
+        return $this->description_colis;
+    }
+
+    public function setDescriptionColis(string $description_colis): self
+    {
+        $this->description_colis = $description_colis;
+
+        return $this;
+    }
+
+    public function getIdEmmeteur(): ?string
+    {
+        return $this->id_emmeteur;
+    }
+
+    public function setIdEmmeteur(string $id_emmeteur): self
+    {
+        $this->id_emmeteur = $id_emmeteur;
 
         return $this;
     }
