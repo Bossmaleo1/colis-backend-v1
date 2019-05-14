@@ -4,8 +4,10 @@ namespace App\Controller;
 use App\Entity\Annonce;
 use App\Entity\VilleAnnonce;
 use App\Entity\Users;
+use App\Entity\Avis;
 use App\Entity\ValidationAnnonce;
 use App\Entity\Notification;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -79,34 +81,7 @@ class HomeController extends AbstractController
     }
 
 
-    public function InsertAvis(Request $request) {
 
-        $em = $this->getDoctrine()->getManager();
-        $note = $request->query->get('note');
-        $commentaire = $request->query('commentaire');
-        $id_annonce = $request->query('id_annonce');
-        $id_emmeteur = $request->query('id_emmeteur');
-        $id_recepteur = $request->query('id_recepteur');
-
-
-        $annonce = $em->getRepository('App\Entity\Annonce')->find($id_annonce);
-        //on ajoute un avis
-        $avis = new Avis();
-        $avis->setNote($note);
-        $avis->setCommentaire($commentaire);
-        $avis->setIdEmmetteur($id_emmeteur);
-        $avis->setIdRecepteur($id_recepteur);
-        $avis->setAnnonce($annonce);
-        $avis->setDate(new \DateTime());
-        $em->persist($avis);
-        $em->flush();
-
-
-        $response = new Response(json_encode(array("succes"=>1)));
-        $response->headers->set('Content-Type', 'application/json');
-        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
-        return $response;
-    }
 
 
     public function Rechercher(Request $request) {
@@ -194,17 +169,18 @@ class HomeController extends AbstractController
         $validation->setAnnonce($annonce);
         $validation->setDescriptionColis($description_colis);
         $validation->setIdEmmeteur($id_emmetteur);
+        $em->persist($validation);
+        $em->flush();
 
         //insertion de la notification
         $notification = new Notification();
-        $notification->setIDLibelle($id_annonce);
+        $notification->setIDLibelle($validation->getId());
         $notification->setIDType(0);
         $notification->setLibelle($Libelle);
         $notification->setEtat(0);
         $notification->setIDUser($annonce->getUsers()->getId());
         $notification->setDate(new \DateTime());
-        $em->persist($validation);
-        $em->flush();
+        $notification->setIdEmmetteur($id_emmetteur);
         $em->persist($notification);
         $em->flush();
         $response = new Response(json_encode(array('succes'=>1)));
@@ -215,7 +191,105 @@ class HomeController extends AbstractController
 
     public function AfficherValidation(Request $request) {
 
+        $resultat = array();
+        $em = $this->getDoctrine()->getManager();
+        $id_user = $request->get('ID_USER');
+        //$user = $em->getRepository('App\Entity\Users')->find($id_user);
+        $validationAnnonceRepository = $em->getRepository('App\Entity\ValidationAnnonce');
+        $listevalidationannonce = $validationAnnonceRepository->finAllValidationByUser($id_user);
 
+        foreach($listevalidationannonce as $validation) {
+            $array_temp = array();
+            $array_temp['id'] =  $validation->getId();
+            $array_temp['description'] =  $validation->getDescriptionColis();
+            $array_temp['date_validation'] = Carbon::parse($validation->getDateValidation())->locale('fr_FR')->diffForHumans();
+            $array_temp['statut_validation'] =  $validation->getStatutValidation();
+            $array_temp['nombre_kilo'] = $validation->getNombreDeKiloMax();
+            $array_temp['id_emmeteur'] = $validation->getIdEmmeteur();
+            $array_temp['id_annonce'] = $validation->getAnnonce()->getId();
+            array_push($resultat,$array_temp);
+        }
+
+        $response = new Response(json_encode($resultat));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+
+    public function AfficherNotification(Request $request) {
+
+        $resultat = array();
+        $id_user = $request->get('ID_USER');
+        $em = $this->getDoctrine()->getManager();
+        $notificationRepository = $this->get('doctrine')->getRepository(Notification::class);
+        $notificationlist = $notificationRepository->findBy(
+            array('ID_User' => $id_user),
+            array(),
+            100,
+            0
+        );
+
+        foreach($notificationlist as $notification_item)
+        {
+            $user = $em->getRepository('App\Entity\Users')->find($notification_item->getIdEmmetteur());
+            $array_temp = array();
+            $array_temp['id'] =  $notification_item->getId();
+            $array_temp['ID_Libelle'] =  $notification_item->getIDLibelle();
+            $array_temp['ID_Type'] = $notification_item->getIDType();
+            $array_temp['Libelle'] =  $notification_item->getLibelle();
+            $array_temp['Etat'] = $notification_item->getEtat();
+            $array_temp['ID_User'] = $notification_item->getIDUser();
+            $array_temp['nom_emmeteur'] = $user->getNom();
+            $array_temp['prenom_emmeteur'] = $user->getPrenom();
+            $array_temp['photo_emmeteur'] = $user->getPhoto();
+            $array_temp['date'] = Carbon::parse($notification_item->getDate())->locale('fr_FR')->diffForHumans();
+            array_push($resultat,$array_temp);
+        }
+
+        $response = new Response(json_encode($resultat));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+
+    public function AfficherCountNotification(Request $request) {
+        $id_user = $request->get('ID_USER');
+        $notificationRepository = $this->get('doctrine')->getRepository(Notification::class);
+        $notificationlist = $notificationRepository->findBy(
+            array('ID_User' => $id_user,'Etat' => 0),
+            array(),
+            100,
+            0
+        );
+        $countnotification = sizeof($notificationlist);
+
+        $response = new Response(json_encode(array('count_notification'=>$countnotification)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+    public function MarquerNotificationLu(Request $request)
+    {
+        $id_user = $request->get('ID_USER');
+        $notificationRepository = $this->get('doctrine')->getRepository(Notification::class);
+        $em = $this->getDoctrine()->getManager();
+        $notificationlist = $notificationRepository->findBy(
+            array('ID_User' => $id_user,'Etat' => 0),
+            array(),
+            100,
+            0
+        );
+
+        foreach($notificationlist as $notification_item)
+        {
+            $notification = $em->getRepository('App\Entity\Notification')->find($notification_item->getId());
+            $notification->setEtat(1);
+            $em->persist($notification);
+            $em->flush();
+        }
 
         $response = new Response(json_encode(array('succes'=>1)));
         $response->headers->set('Content-Type', 'application/json');
@@ -223,6 +297,109 @@ class HomeController extends AbstractController
         return $response;
     }
 
+    public function ValidationAnnulationDemandeExpedition(Request $request) {
+        $id_validation = $request->get('id_validation');
+        $id_emmeteur = $request->get('id_emmeteur');
+        $Libelle = $request->get('message');
+        $etat = $request->get('etat');
+        $em = $this->getDoctrine()->getManager();
+        $validation = $em->getRepository('App\Entity\ValidationAnnonce')->find($id_validation);
+        //si la personne accepter la demande d'envoie
+        if ($etat == 1) {
+            $validation->setStatutValidation(1);
+            // si la personne vient d'annuler une demande
+        } else if ($etat == 2) {
+            $validation->setStatutValidation(2);
+        }
+        $em->persist($validation);
+        $em->flush();
+
+        //insertion de la notification
+        $notification = new Notification();
+        $notification->setIDLibelle($validation->getId());
+        $notification->setIDType(1);// 1 lorsqu'il s'agit de la notification sur un avis
+        $notification->setLibelle($Libelle);
+        $notification->setEtat(0);
+        $notification->setIDUser($validation->getIdEmmeteur());
+        $notification->setDate(new \DateTime());
+        $notification->setIdEmmetteur($id_emmeteur);
+        $em->persist($notification);
+        $em->flush();
+
+        $response = new Response(json_encode(array('succes'=>1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+    public function InsertAvis(Request $request) {
+
+        $em = $this->getDoctrine()->getManager();
+        $note = $request->query->get('note');
+        $commentaire = $request->get('commentaire');
+        $id_annonce = $request->get('id_annonce');
+        $id_emmeteur = $request->get('id_emmeteur');
+        $Libelle = $request->get('message');
+
+
+        $annonce = $em->getRepository('App\Entity\Annonce')->find($id_annonce);
+        //on ajoute un avis
+        $avis = new Avis();
+        $avis->setNote($note);
+        $avis->setCommentaire($commentaire);
+        $avis->setIdEmmetteur($id_emmeteur);
+        $avis->setAnnonce($annonce);
+        $avis->setDate(new \DateTime());
+        $em->persist($avis);
+        $em->flush();
+        //insertion de la notification
+        $notification = new Notification();
+        $notification->setIDLibelle($avis->getId());
+        $notification->setIDType(1);// 1 lorsqu'il s'agit de la notification sur un avis
+        $notification->setLibelle($Libelle);
+        $notification->setEtat(0);
+        $notification->setIDUser($annonce->getUsers()->getId());
+        $notification->setDate(new \DateTime());
+        $notification->setIdEmmetteur($id_emmeteur);
+        $em->persist($notification);
+        $em->flush();
+
+
+        $response = new Response(json_encode(array("succes"=>1)));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
+
+
+    public function AfficherAvis(Request $request)
+    {
+        $resultat = array();
+        $em = $this->getDoctrine()->getManager();
+        $id_user = $request->get('ID_USER');
+        $avisRepository = $em->getRepository('App\Entity\Avis');
+        $listeavis = $avisRepository->finAllAvisByUser($id_user);
+
+        foreach($listeavis as $avis) {
+            $user = $em->getRepository('App\Entity\Users')->find($avis->getIdEmmetteur());
+            $array_temp = array();
+            $array_temp['id'] =  $avis->getId();
+            $array_temp['note'] =  $avis->getNote();
+            $array_temp['commentaire'] = $avis->getCommentaire();
+            $array_temp['date'] = Carbon::parse($avis->getDate())->locale('fr_FR')->diffForHumans();
+            $array_temp['id_emmeteur'] = $avis->getIdEmmetteur();
+            $array_temp['id_annonce'] = $avis->getAnnonce()->getId();
+            $array_temp['nom_emmeteur'] = $user->getNom();
+            $array_temp['prenom_emmeteur'] = $user->getPrenom();
+            $array_temp['photo_emmeteur'] = $user->getPhoto();
+            array_push($resultat,$array_temp);
+        }
+
+        $response = new Response(json_encode($resultat));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', 'http://wazzaby.com');
+        return $response;
+    }
 
 
 }

@@ -19,6 +19,13 @@ class AvisRepository extends ServiceEntityRepository
         parent::__construct($registry, Avis::class);
     }
 
+    public function finAllAvisByUser($user)
+    {
+        $query = $this->_em->createQuery("SELECT a FROM App\Entity\Avis a JOIN a.annonce u WHERE u.users=".$user." ");
+        $query->setMaxResults(20);
+        return $query->getResult();
+    }
+
     // /**
     //  * @return Avis[] Returns an array of Avis objects
     //  */

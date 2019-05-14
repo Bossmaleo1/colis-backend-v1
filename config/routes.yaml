@@ -48,3 +48,23 @@ app_api_InsertValidation:
 app_api_AfficherValidation:
   path: /api/AfficherValidation
   controller: App\Controller\HomeController::AfficherValidation
+
+app_api_AfficherNotification:
+  path: /api/AfficherNotification
+  controller: App\Controller\HomeController::AfficherNotification
+
+app_api_AfficherCountNotification:
+  path: /api/AfficherCountNotification
+  controller: App\Controller\HomeController::AfficherCountNotification
+
+app_api_MarquerNotificationLu:
+  path: /api/MarquerNotificationLu
+  controller: App\Controller\HomeController::MarquerNotificationLu
+
+app_api_ValidationAnnulationDemandeExpedition:
+  path: /api/ValidationAnnulationDemandeExpedition
+  controller: App\Controller\HomeController::ValidationAnnulationDemandeExpedition
+
+app_api_AfficherAvis:
+  path: /api/AfficherAvis
+  controller: App\Controller\HomeController::AfficherAvis

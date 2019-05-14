@@ -46,6 +46,11 @@ class Notification
      */
     private $date;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $id_emmetteur;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +124,18 @@ class Notification
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getIdEmmetteur(): ?int
+    {
+        return $this->id_emmetteur;
+    }
+
+    public function setIdEmmetteur(int $id_emmetteur): self
+    {
+        $this->id_emmetteur = $id_emmetteur;
 
         return $this;
     }

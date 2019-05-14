@@ -42,10 +42,6 @@ class Avis
      */
     private $id_emmetteur;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $id_recepteur;
 
     public function getId(): ?int
     {
@@ -112,15 +108,4 @@ class Avis
         return $this;
     }
 
-    public function getIdRecepteur(): ?int
-    {
-        return $this->id_recepteur;
-    }
-
-    public function setIdRecepteur(int $id_recepteur): self
-    {
-        $this->id_recepteur = $id_recepteur;
-
-        return $this;
-    }
 }

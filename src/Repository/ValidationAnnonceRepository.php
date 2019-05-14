@@ -19,6 +19,13 @@ class ValidationAnnonceRepository extends ServiceEntityRepository
         parent::__construct($registry, ValidationAnnonce::class);
     }
 
+    public function finAllValidationByUser($user)
+    {
+        $query = $this->_em->createQuery("SELECT a FROM App\Entity\ValidationAnnonce a JOIN a.annonce u WHERE u.users=".$user." AND a.statut_validation=0");
+        $query->setMaxResults(20);
+        return $query->getResult();
+    }
+
     // /**
     //  * @return ValidationAnnonce[] Returns an array of ValidationAnnonce objects
     //  */
