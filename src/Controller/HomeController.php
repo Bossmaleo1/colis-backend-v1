@@ -194,7 +194,6 @@ class HomeController extends AbstractController
         $resultat = array();
         $em = $this->getDoctrine()->getManager();
         $id_user = $request->get('ID_USER');
-        //$user = $em->getRepository('App\Entity\Users')->find($id_user);
         $validationAnnonceRepository = $em->getRepository('App\Entity\ValidationAnnonce');
         $listevalidationannonce = $validationAnnonceRepository->finAllValidationByUser($id_user);
 
@@ -206,7 +205,11 @@ class HomeController extends AbstractController
             $array_temp['statut_validation'] =  $validation->getStatutValidation();
             $array_temp['nombre_kilo'] = $validation->getNombreDeKiloMax();
             $array_temp['id_emmeteur'] = $validation->getIdEmmeteur();
+			$user = $em->getRepository('App\Entity\Users')->find($validation->getIdEmmeteur());
             $array_temp['id_annonce'] = $validation->getAnnonce()->getId();
+			$array_temp['nom_emmeteur'] = $user->getNom();
+            $array_temp['prenom_emmeteur'] = $user->getPrenom();
+            $array_temp['photo_emmeteur'] = $user->getPhoto();
             array_push($resultat,$array_temp);
         }
 
@@ -232,9 +235,12 @@ class HomeController extends AbstractController
 
         foreach($notificationlist as $notification_item)
         {
-            $user = $em->getRepository('App\Entity\Users')->find($notification_item->getIdEmmetteur());
+            //$user = $em->getRepository('App\Entity\Users')->find($notification_item->getIdEmmetteur());
             $array_temp = array();
-            $array_temp['id'] =  $notification_item->getId();
+            $array_temp['etat'] =  $notification_item->getEtat();
+            $array_temp['id_libelle'] = $notification_item->getIDLibelle();
+            $array_temp['id_type'] = $notification_item->getIDType();
+            /*$array_temp['id'] =  $notification_item->getId();
             $array_temp['ID_Libelle'] =  $notification_item->getIDLibelle();
             $array_temp['ID_Type'] = $notification_item->getIDType();
             $array_temp['Libelle'] =  $notification_item->getLibelle();
@@ -243,7 +249,26 @@ class HomeController extends AbstractController
             $array_temp['nom_emmeteur'] = $user->getNom();
             $array_temp['prenom_emmeteur'] = $user->getPrenom();
             $array_temp['photo_emmeteur'] = $user->getPhoto();
-            $array_temp['date'] = Carbon::parse($notification_item->getDate())->locale('fr_FR')->diffForHumans();
+            $array_temp['date'] = Carbon::parse($notification_item->getDate())->locale('fr_FR')->diffForHumans();*/
+            if($notification_item->getIDType()===0)
+            {
+                $validation = $em->getRepository('App\Entity\ValidationAnnonce')->find($notification_item->getIDLibelle());
+                $array_temp['id'] =  $validation->getId();
+                $array_temp['description'] =  $validation->getDescriptionColis();
+                $array_temp['date_validation'] = Carbon::parse($validation->getDateValidation())->locale('fr_FR')->diffForHumans();
+                $array_temp['statut_validation'] =  $validation->getStatutValidation();
+                $array_temp['nombre_kilo'] = $validation->getNombreDeKiloMax();
+                $array_temp['id_emmeteur'] = $validation->getIdEmmeteur();
+                $user = $em->getRepository('App\Entity\Users')->find($validation->getIdEmmeteur());
+                $array_temp['id_annonce'] = $validation->getAnnonce()->getId();
+                $array_temp['nom_emmeteur'] = $user->getNom();
+                $array_temp['prenom_emmeteur'] = $user->getPrenom();
+                $array_temp['photo_emmeteur'] = $user->getPhoto();
+                $array_temp['phone_emmeteur'] = $user->getTelephone();
+                $array_temp['keypush_emmeteur'] = $user->getKeypush();
+            } else {
+
+            }
             array_push($resultat,$array_temp);
         }
 
